@@ -9,15 +9,25 @@ YELLOW=$PADRAO"01;33;01m"
 BLUE=$PADRAO"01;34;01m"
 ROSA=$PADRAO"01;35;01m"
 
+#-----------------------------------------tratamento de dominio----------------------------------#
+#TRATANOME=awk -F "//" '{print $2}' alvo.txt > nomealvo.txt
+
+#----------------------------------------atualiza repos----------------------------------------#
+echo -e "$GREEN atualizando repositorios$FORMATACOR"
+echo -e "---------------------------------------------------------------------------------------"
+apt update && apt upgrade -y
+echo -e "---------------------------------------------------------------------------------------"
+sleep 3
 #----------------------------------------digitar dominio------------------------------------------#
 
-read -p "digite o dominio desejado:"
+read -p "URL:"
 
 #------------------criar arquivo com parametro para o curl utilizar e enviar para alvo.txt--------#
 echo 'url='$REPLY > ~/alvo.txt
-
+sleep 3
 #------------------------------se existir o arquivo alvo.txt---------------------------------------#
-if cat alvo.txt;
+if
+echo -e "$GREEN verificando headers $FORMATACOR"
 
 #------------entao utilizar o curl neste arquivo extraindo cabeçalho e jogar para headers.txt-----------#
 then
@@ -45,7 +55,7 @@ fi
 		echo -e "---------------------------------------------------------------------------------------"
 	fi
 
-		sleep 4
+		sleep 3
 	if
                 cat  headers.txt | egrep -e "Strict-Transport-Security" -e "includeSubDomains;"
         then
@@ -63,7 +73,7 @@ fi
 
         fi
 
-		sleep 4
+		sleep 3
 	if
                 cat  headers.txt | grep  "X-Content-Type-Options"
         then
@@ -80,7 +90,7 @@ fi
 		echo -e "---------------------------------------------------------------------------------------"
         fi
 
-		sleep 4
+		sleep 3
 	if
                 cat  headers.txt | grep  "X-Frame-Options"
         then
@@ -97,7 +107,7 @@ fi
 		echo -e "---------------------------------------------------------------------------------------"
         fi
 
-		sleep 4
+		sleep 3
 	if
                 cat  headers.txt | grep "X-XSS-Protection"
         then
@@ -115,7 +125,7 @@ fi
 
         fi
 
-		sleep 4
+		sleep 3
 	if
                 cat  headers.txt | grep  "Referrer-Policy"
         then
@@ -132,7 +142,7 @@ fi
 		echo -e "---------------------------------------------------------------------------------------"
         fi
 
-		sleep 4
+		sleep 3
 
 	if
                 cat  headers.txt | grep  "Access-Control-Allow-Origin: *"
@@ -146,3 +156,54 @@ fi
                 echo -e "$BLUE REFERÊNCIAS:\n $FORMATACOR \n https://portswigger.net/research/exploiting-corsmisconfigurations-for-bitcoins-and-bounties \n\n"
 		echo -e "---------------------------------------------------------------------------------------"
         fi
+
+
+		sleep 3
+
+	if
+		cat headers.txt | grep "Cookie"
+	then
+		echo -e "$GREEN Attributes found on cookies $FORMATACOR"
+		cat headers.txt | grep "Cookie" | awk -F ";" '{print $6 echo " | " $7 echo " | " $8}'
+		echo -e "---------------------------------------------------------------------------------------"
+
+	else
+		cat headers.txt | grep "Cookie" | awk -F ";" '{print $6 $7 $8}'
+		echo -e "Os cookies nao possuem os parametros de segurança $RED httponly secure $FORMATACOR & $RED samesite $FORMATACOR"
+		echo -e "---------------------------------------------------------------------------------------"
+
+	fi
+		sleep 3
+
+	if
+		echo -e "$GREEN iniciando verificacao de versionamento TLS em$FORMATACOR $BLUE $REPLY $FORMATACOR"
+		echo -e "---------------------------------------------------------------------------------------"
+	then
+		echo -e "$BLUE clonando repo de verificacao tls $FORMATACOR"
+		echo -e "---------------------------------------------------------------------------------------"
+		git clone https://github.com/drwetter/testssl.sh.git
+		chmod 777 /root/testssl.sh/testssl.sh
+		cd /root/testssl.sh/
+		./testssl.sh $REPLY > tlsversion.txt
+		cat tlsversion.txt | head -n 34 | tail -n 14
+#		cat tlsversion.txt | head -n 215 | tail -n 4
+		echo -e "---------------------------------------------------------------------------------------"
+	fi
+		sleep 3
+	if
+		echo -e "$GREEN iniciando footprint de diretorios em$FORMATACOR $BLUE $REPLY $FORMATACOR"
+		echo -e "---------------------------------------------------------------------------------------"
+	then
+		echo -e "$GREEN instalando ferramenta para information gathering$FORMATACOR"
+		apt install gobuster -y
+		echo -e "---------------------------------------------------------------------------------------"
+		echo -e "$GREEN inputando wordlists $FORMATACOR"
+		echo -e "---------------------------------------------------------------------------------------"
+		apt install seclists -y
+		apt install dirb -y
+		echo -e "---------------------------------------------------------------------------------------"
+		gobuster dir -w /usr/share/dirb/wordlists/big.txt -u $REPLY -b 403,404 > bruteforce.txt
+#		gobuster dir -w /usr/share/dirb/wordlists/big.txt -u $REPLY -b 403,404
+		cat bruteforce.txt | egrep -e "200|301"
+		echo -e "---------------------------------------------------------------------------------------"
+	fi
