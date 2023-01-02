@@ -48,7 +48,7 @@ if content['strict-transport-security'.upper()]:
 	print ("HSTS -->" + GREEN + " OK" + RESET)
 	print ("\r\n")
 else:
-	print (RED + REVERSE + "HSTS --> NOT OK" + RESET)
+	print (REVERSE + RED + "HSTS --> NOT OK" + RESET)
 	print ("\r\n")
 	print (MAGENTA + "Informções sobre a vulnerabilidade:" + RESET)
 	print ("\r\n")
@@ -65,7 +65,7 @@ if content['X-Content-Type-Options'.upper()]:
 	print ("X-Content-Type-Options -->" + GREEN + " OK" + RESET)
 	print ("\r\n")
 else:
-	print (RED + REVERSE + "X-Content-Type-Options --> NOT OK" + RESET)
+	print (REVERSE + RED + "X-Content-Type-Options --> NOT OK" + RESET)
 	print ("\r\n")
 	print (MAGENTA + "Informções sobre a vulnerabilidade:" + RESET)
 	print ("\r\n")
@@ -96,11 +96,22 @@ else:
 	print ("\r\n")
 
 if content['content-security-policy'.upper()]:
-	print ("CSP -->" + GREEN + " OK" + RESET)
+	print ("Content Security Policy -->" + GREEN + " OK" + RESET)
 	print ("\r\n")
 else:
-	print ("CSP -->" + RED + " NOT OK" + RESET)
+	print (REVERSE + RED + "Content Security Policy --> NOT OK" + RESET)
 	print ("\r\n")
+	print (MAGENTA + "Informções sobre a vulnerabilidade:" + RESET)
+	print ("\r\n")
+	print (MAGENTA + "Classification:" + RESET + " LOW")
+	print ("\r\n")
+	print (MAGENTA + "Name:" + RESET + " Content Security Policy (CSP) not implemented")
+	print ("\r\n")
+	print (MAGENTA + "Description:" + RESET + " A Política de Segurança de Conteúdo (CSP) é uma camada adicional de segurança que ajuda a detectar e mitigar certos tipos de ataques, incluindo Cross Site Scripting (XSS) e ataques de injeção de dados. A Política de Segurança de Conteúdo (CSP) pode ser implementada adicionando um Cabeçalho de política de segurança de conteúdo. O valor deste cabeçalho é uma string contendo as diretivas de política que descrevem sua Política de Segurança de Conteúdo. Para implementar o CSP, você deve definir listas de origens permitidas para todos os tipos de recursos que seu site utiliza. Por exemplo, se você tem um site simples que precisa carregar scripts, folhas de estilo e imagens hospedadas localmente, bem como da biblioteca jQuery de seu CDN, o cabeçalho CSP pode ter a seguinte aparência: Content-Security-Policy: default-src 'self'; script-src 'self' https://code.jquery.com; Foi detectado que seu aplicativo Web não implementa a Política de Segurança de Conteúdo (CSP) porque o cabeçalho CSP está ausente da resposta. É recomendável implementar a Política de Segurança de Conteúdo (CSP) em seu aplicativo da web.")
+	print ("\r\n")
+	print (MAGENTA + "Mitigation:" + RESET + " É recomendável implementar a Política de Segurança de Conteúdo (CSP) em seu aplicativo da web. A configuração do Content SecurityPolicy envolve adicionar o cabeçalho HTTP Content-Security-Policy a uma página da Web e fornecer valores para controlar os recursos que o agente do usuário tem permissão para carregar para essa página.")
+	print ("\r\n")
+
 
 if content['X-XSS-Protection'.upper()]:
 	print ("X-XSS-Protection -->" + GREEN + " OK" + RESET)
@@ -108,11 +119,23 @@ if content['X-XSS-Protection'.upper()]:
 else:
 	print (REVERSE + RED + "X-XSS-Protection --> NOT OK" + RESET)
 	print ("\r\n")
+	print (MAGENTA + "Informções sobre a vulnerabilidade:" + RESET)
+	print ("\r\n")
+	print (MAGENTA + "Classification:" + RESET + " LOW")
+	print ("\r\n")
+	print (MAGENTA + "Name:" + RESET + " Missing X-XSS-Protection")
+	print ("\r\n")
+	print (MAGENTA + "Description:" + RESET + " O cabeçalho de resposta HTTP 'X-XSS-Protection' é um recurso dos navegadores modernos que permite que os sites controlem seus auditores XSS. O servidor não está configurado para retornar um cabeçalho 'X-XSS-Protection', o que significa que qualquer página neste site pode estar sob o risco de um ataque Cross-Site Scripting (XSS). Este URL é sinalizado como um exemplo específico. Se o suporte a navegadores legados não for necessário, é recomendável usar Content-Security-Policy sem permitir scripts embutidos não seguros.")
+	print ("\r\n")
+	print (MAGENTA + "Mitigation:" + RESET + " Configure seu servidor web para incluir um cabeçalho 'X-XSS-Protection' com um valor de '1; mode=block' em todas as páginas.")
+	print ("\r\n")
+
 
 #--> Portscan <--#
 
 for port in range (1,65536):
 	skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	skt.settimeout(0.01)
 	if skt.connect_ex((domain,port)) == 0:
 		print ("[+] Open",port,"Port [+]")
 	else:
@@ -120,16 +143,16 @@ for port in range (1,65536):
 
 #--> bannergrabbing FTP <--#
 
-FTPport = 21
+#FTPport = 21
 
-skt1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-skt1.connect_ex((domain,FTPport))
-banner = skt1.recv(128)
-if len (banner) >= 128:
-	print (BLUE + "[+] --> FTP Banner Found <-- [+]" + RESET)
-	print ("\r\n")
-	print (banner)
-	print ("\r\n")
-else:
-	print ("Banner Not Found")
-	print ("\r\n")
+#skt1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#skt1.connect_ex((domain,FTPport))
+#banner = skt1.recv(128)
+#if len (banner) >= 128:
+#	print (BLUE + "[+] --> FTP Banner Found <-- [+]" + RESET)
+#	print ("\r\n")
+#	print (banner)
+#	print ("\r\n")
+#else:
+#	print ("Banner Not Found")
+#	print ("\r\n")
