@@ -6,6 +6,7 @@ import colorama
 from colorama import Fore
 import urllib.request
 import socket
+import sys
 
 RED   = "\033[1;31m"
 BLUE  = "\033[1;34m"
@@ -22,7 +23,7 @@ BLACK = '\033[30m'
 
 
 print ("\r\n")
-url = input("URL: ")
+url = sys.argv[1]
 print ("\r\n")
 site = urllib.request.urlopen(url)
 content = site.info()
@@ -31,7 +32,7 @@ content = site.info()
 print (REVERSE + CYAN + "DNS Resolver" + RESET)
 print ("\r\n")
 #domain = input("Domain: ")
-trat = url.replace ("https","")
+trat = url.replace ("http","")
 trat1 = trat.replace (":","")
 domain = trat1.replace ("//","")
 #print ("Host: ",domain,"IP: ",socket.gethostbyname(domain))
